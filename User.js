@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const userId = req.params.id;
   try {
-    const { rows } = await pool.query('SELECT * FROM botuser WHERE id = $1', [userId]);
+    const { rows } = await pool.query('SELECT * FROM botuser WHERE userid = $1', [userId]);
     if (rows.length === 0) {
       res.status(404).json({ error: 'User not found' });
     } else {

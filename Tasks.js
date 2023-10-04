@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const taskId = req.params.id;
   try {
-    const { rows } = await pool.query('SELECT * FROM task WHERE id = $1', [taskId]);
+    const { rows } = await pool.query('SELECT * FROM task WHERE taskid = $1', [taskId]);
     if (rows.length === 0) {
       res.status(404).json({ error: 'Task not found' });
     } else {
