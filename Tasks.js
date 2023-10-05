@@ -57,16 +57,25 @@ router.post('/', async (req, res) => {
     let currentDate = new Date();
     currentDate = currentDate.toISOString().replace('T', ' ').slice(0, -5);
 
-    const {actualid} = await pool.query('SELECT userid FROM botuser WHERE telegramid = $1',[userid]);
+    const { rows } = await pool.query('SELECT userid FROM botuser WHERE telegramid = $1', [userid]);
 
-    const query = 'INSERT INTO task (message, creationdate, status, userid) VALUES ($1, $2, $3, $4) RETURNING *'
-    const { rows } = await pool.query(query, [message, currentDate, status, actualid]);
-    res.status(201).json(rows[0]);
+    if (rows.length === 0) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    const actualid = rows[0].userid;
+    console.log('actualid:', actualid);
+
+    const query = 'INSERT INTO task (message, creationdate, status, userid) VALUES ($1, $2, $3, $4) RETURNING *';
+    const { rows: insertedRows } = await pool.query(query, [message, currentDate, status, actualid]);
+    res.status(201).json(insertedRows[0]);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 router.put('/:id', async (req, res) => {
   const taskId = req.params.id;
