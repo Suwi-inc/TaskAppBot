@@ -57,8 +57,10 @@ router.post('/', async (req, res) => {
     let currentDate = new Date();
     currentDate = currentDate.toISOString().replace('T', ' ').slice(0, -5);
 
+    const {actualid} = await pool.query('SELECT userid FROM botuser WHERE telegramid = $1',[userid]);
+
     const query = 'INSERT INTO task (message, creationdate, status, userid) VALUES ($1, $2, $3, $4) RETURNING *'
-    const { rows } = await pool.query(query, [message, currentDate, status, userid]);
+    const { rows } = await pool.query(query, [message, currentDate, status, actualid]);
     res.status(201).json(rows[0]);
   } catch (error) {
     console.error(error);

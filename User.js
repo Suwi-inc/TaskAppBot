@@ -37,6 +37,23 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+///might not need this
+router.get('/telegram/:telegramid', async (req, res) => {
+  const telegramid = req.params.telegramid; 
+  try {
+    const { rows } = await pool.query('SELECT userid FROM botuser WHERE telegramid = $1', [telegramid]);
+    if (rows.length === 0) {
+      res.status(404).json({ error: 'User not found' });
+    } else {
+      res.json(rows[0]); 
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 router.post('/', async (req, res) => {
   const { telegramid, username, email, password } = req.body;
   try {
