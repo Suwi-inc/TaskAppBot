@@ -1,15 +1,13 @@
 const express = require('express');
+require("dotenv").config();
 const app = express();
-const port = process.env.PORT || 3002;
+const port = process.env.PORT;
 
-// Middleware to parse JSON request bodies
 app.use(express.json());
 
-// Import user and task controllers
 const userController = require('./User');
 const taskController = require('./Tasks');
 
-// Routes for users and tasks
 app.use('/users', userController);
 app.use('/tasks', taskController);
 

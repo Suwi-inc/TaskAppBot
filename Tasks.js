@@ -1,14 +1,14 @@
 const express = require('express');
+require("dotenv").config();
 const { Pool } = require('pg');
 const router = express.Router();
 
-const URL = 'postgres://mqpnptxk:RmLLPKHco0tZNR3p7pr0lhCc2BnJzhwQ@ella.db.elephantsql.com/mqpnptxk';
+const URL = process.env.DBURL;
 
-// PostgreSQL/ElephantSQL database configuration
 const pool = new Pool({
   connectionString: URL,
   ssl: {
-    rejectUnauthorized: false, // Needed for self-signed certificates (local development)
+    rejectUnauthorized: false, 
   },
 });
 
@@ -36,6 +36,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 router.get('/telegram/:telegramid', async (req, res) => {
   const telegramid = req.params.telegramid; 
   if (!telegramid) {
