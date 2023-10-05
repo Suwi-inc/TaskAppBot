@@ -36,6 +36,20 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+router.get('/telegram/:telegramid', async (req, res) => {
+  const telegramid = req.params.telegramid; 
+  if (!telegramid) {
+   
+    return res.status(400).json({ error: 'Telegram ID is required' });
+  }
+  try {
+    const { rows } = await pool.query('SELECT message from task t JOIN botuser b ON b.userid = t.userid where b.telegramid = $1;', [telegramid]);
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 router.post('/', async (req, res) => {
   const { message, status, userid } = req.body;

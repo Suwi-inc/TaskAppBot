@@ -38,10 +38,16 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { telegramid,username, email,password } = req.body;
+  const { telegramid, username, email, password } = req.body;
   try {
-    const { rows } = await pool.query('INSERT INTO botuser (telegramid,username, email,password) VALUES ($1, $2,$3,$4) RETURNING *', [telegramid,username, email,password]);
-    res.status(201).json(rows[0]);
+    const existingUser = await pool.query('SELECT * FROM botuser WHERE telegramid = $1', [telegramid]);
+
+    if (existingUser.rows.length === 0) {
+      const { rows } = await pool.query('INSERT INTO botuser (telegramid, username, email, password) VALUES ($1, $2, $3, $4) RETURNING *', [telegramid, username, email, password]);
+      res.status(201).json(rows[0]);
+    } else {
+      res.status(200).json({ message: 'User with the same telegramid already exists' });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
