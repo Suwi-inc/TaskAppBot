@@ -38,9 +38,9 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { name, email } = req.body;
+  const { telegramid,username, email,password } = req.body;
   try {
-    const { rows } = await pool.query('INSERT INTO botuser (name, email) VALUES ($1, $2) RETURNING *', [name, email]);
+    const { rows } = await pool.query('INSERT INTO botuser (telegramid,username, email,password) VALUES ($1, $2,$3,$4) RETURNING *', [telegramid,username, email,password]);
     res.status(201).json(rows[0]);
   } catch (error) {
     console.error(error);
