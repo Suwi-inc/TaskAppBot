@@ -53,7 +53,7 @@ router.get('/telegram/:telegramid', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { message, status, userid } = req.body;
+  const { message, status, senderurl, userid } = req.body;
   try {
     let currentDate = new Date();
     currentDate = currentDate.toISOString().replace('T', ' ').slice(0, -5);
@@ -68,8 +68,8 @@ router.post('/', async (req, res) => {
     const actualid = rows[0].userid;
     console.log('actualid:', actualid);
 
-    const query = 'INSERT INTO task (message, creationdate, status, userid) VALUES ($1, $2, $3, $4) RETURNING *';
-    const { rows: insertedRows } = await pool.query(query, [message, currentDate, status, actualid]);
+    const query = 'INSERT INTO task (creationdate,message, status, senderurl,userid) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+    const { rows: insertedRows } = await pool.query(query, [ currentDate, message,status,senderurl, actualid]);
     res.status(201).json(insertedRows[0]);
   } catch (error) {
     console.error(error);
