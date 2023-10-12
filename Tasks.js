@@ -44,7 +44,8 @@ router.get('/telegram/:telegramid', async (req, res) => {
     return res.status(400).json({ error: 'Telegram ID is required' });
   }
   try {
-    const { rows } = await pool.query('SELECT message from task t JOIN botuser b ON b.userid = t.userid where b.telegramid = $1;', [telegramid]);
+    //now return a whole task json object
+    const { rows } = await pool.query('SELECT * from task t JOIN botuser b ON b.userid = t.userid where b.telegramid = $1;', [telegramid]);
     res.json(rows);
   } catch (error) {
     console.error(error);
