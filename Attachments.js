@@ -11,7 +11,7 @@ const pool = new Pool({
     rejectUnauthorized: false, 
   },
 });
-
+//get json object of attachments
 router.get('/', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM attachment');
@@ -38,6 +38,7 @@ router.get('/:id', async (req, res) => {
 });
 
 //get attachment by task id, task id is passed in params req, recieve a json of all attachements  givem task id
+//need to add router that gets the task id before calling this router
 router.get('/telegram/:telegramid', async (req, res) => {
   const taskid = req.params.taskId; 
   if (!taskid) {
