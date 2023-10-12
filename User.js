@@ -37,6 +37,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+//get user by telegram id
 router.get('/telegram/:telegramid', async (req, res) => {
   const telegramid = req.params.telegramid; 
   try {
@@ -73,7 +74,7 @@ router.post('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const userId = req.params.id;
   try {
-    const { rows } = await pool.query('DELETE FROM botuser WHERE id = $1 RETURNING *', [userId]);
+    const { rows } = await pool.query('DELETE FROM botuser WHERE userid = $1 RETURNING *', [userId]);
     if (rows.length === 0) {
       res.status(404).json({ error: 'User not found' });
     } else {

@@ -77,12 +77,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-
+//edit user
 router.put('/:id', async (req, res) => {
   const taskId = req.params.id;
-  const { message, status } = req.body;
+  const { message, status, reminder } = req.body;
   try {
-    const { rows } = await pool.query('UPDATE task SET message = $1, status = $2 WHERE id = $3 RETURNING *', [message, status, taskId]);
+    const { rows } = await pool.query('UPDATE task SET message = $1, status = $2, reminder = $3 WHERE id = $4 RETURNING *', [message, status,reminder, taskId]);
     if (rows.length === 0) {
       res.status(404).json({ error: 'Task not found' });
     } else {
@@ -97,7 +97,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const taskId = req.params.id;
   try {
-    const { rows } = await pool.query('DELETE FROM task WHERE id = $1 RETURNING *', [taskId]);
+    const { rows } = await pool.query('DELETE FROM task WHERE taskid = $1 RETURNING *', [taskId]);
     if (rows.length === 0) {
       res.status(404).json({ error: 'Task not found' });
     } else {
