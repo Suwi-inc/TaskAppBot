@@ -114,7 +114,7 @@ router.put('/:id', async (req, res) => {
   const taskId = req.params.id;
   const { message, status, reminder } = req.body;
   try {
-    const { rows } = await pool.query('UPDATE task SET message = $1, status = $2, reminder = $3 WHERE id = $4 RETURNING *', [message, status,reminder, taskId]);
+    const { rows } = await pool.query('UPDATE task SET message = $1, status = $2, reminder = $3 WHERE taskid = $4 RETURNING *', [message, status,reminder, taskId]);
     if (rows.length === 0) {
       res.status(404).json({ error: 'Task not found' });
     } else {
@@ -132,7 +132,7 @@ router.put('/status/:id', async (req, res) => {
   const taskId = req.params.id;
   const {status} = req.body;
   try {
-    const { rows } = await pool.query('UPDATE task SET status = $1 WHERE id = $2 RETURNING *', [status, taskId]);
+    const { rows } = await pool.query('UPDATE task SET status = $1 WHERE taskid = $2 RETURNING *', [status, taskId]);
     if (rows.length === 0) {
       res.status(404).json({ error: 'Task not found' });
     } else {
@@ -149,7 +149,7 @@ router.put('/reminder/:id', async (req, res) => {
   const taskId = req.params.id;
   const { reminder } = req.body;
   try {
-    const { rows } = await pool.query('UPDATE task SET reminder = $1 WHERE id = $4 RETURNING *', [reminder, taskId]);
+    const { rows } = await pool.query('UPDATE task SET reminder = $1 WHERE taskid = $4 RETURNING *', [reminder, taskId]);
     if (rows.length === 0) {
       res.status(404).json({ error: 'Task not found' });
     } else {
