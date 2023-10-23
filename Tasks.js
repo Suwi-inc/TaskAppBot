@@ -12,9 +12,21 @@ const pool = new Pool({
   },
 });
 
+//get all tasks
 router.get('/', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM task');
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//get completed tasks
+router.get('/completed', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM task where status = $1 ',['DONE']);
     res.json(rows);
   } catch (error) {
     console.error(error);
@@ -37,6 +49,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+
+//get tasks by user's telegram id
 router.get('/telegram/:telegramid', async (req, res) => {
   const telegramid = req.params.telegramid; 
   if (!telegramid) {
@@ -44,14 +58,31 @@ router.get('/telegram/:telegramid', async (req, res) => {
     return res.status(400).json({ error: 'Telegram ID is required' });
   }
   try {
-    //now return a whole task json object
-    const { rows } = await pool.query('SELECT * from task t JOIN botuser b ON b.userid = t.userid where b.telegramid = $1;', [telegramid]);
+    const { rows } = await pool.query('SELECT * from task t JOIN botuser b ON b.userid = t.userid where b.telegramid = $1', [telegramid]);
     res.json(rows);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+//get completed tasks by user's telegram id
+router.get('/telegram/completed/:telegramid', async (req, res) => {
+  const telegramid = req.params.telegramid; 
+  if (!telegramid) {
+   
+    return res.status(400).json({ error: 'Telegram ID is required' });
+  }
+  try {
+    const { rows } = await pool.query('SELECT * from task t JOIN botuser b ON b.userid = t.userid where b.telegramid = $1 and t.status = $2', [telegramid, 'DONE']);
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 router.post('/', async (req, res) => {
   const { message, status, senderurl, userid } = req.body;
@@ -78,7 +109,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-//edit user
+//edit task
 router.put('/:id', async (req, res) => {
   const taskId = req.params.id;
   const { message, status, reminder } = req.body;
@@ -94,6 +125,43 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+//edit task status
+router.put('/status/:id', async (req, res) => {
+  const taskId = req.params.id;
+  const {status} = req.body;
+  try {
+    const { rows } = await pool.query('UPDATE task SET status = $1 WHERE id = $2 RETURNING *', [status, taskId]);
+    if (rows.length === 0) {
+      res.status(404).json({ error: 'Task not found' });
+    } else {
+      res.json(rows[0]);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//edit task reminder 
+router.put('/reminder/:id', async (req, res) => {
+  const taskId = req.params.id;
+  const { reminder } = req.body;
+  try {
+    const { rows } = await pool.query('UPDATE task SET reminder = $1 WHERE id = $4 RETURNING *', [reminder, taskId]);
+    if (rows.length === 0) {
+      res.status(404).json({ error: 'Task not found' });
+    } else {
+      res.json(rows[0]);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 
 router.delete('/:id', async (req, res) => {
   const taskId = req.params.id;
