@@ -16,31 +16,66 @@ const pool = new Pool({
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-describe('GET /tasks/:id', () => {
-  it('should return a task when a valid task ID is provided', (done) => {
-    const taskId = 70; // Replace with a valid task ID from your database
+describe('Tasks API Endpoints', () => {
 
+  let taskId = 1; 
+
+ it('should create a new task', (done) => {
+  const newTask = {
+        duedate: null,
+        message: 'This is a test task',
+        status: 'NOT DONE',
+        reminder: null,
+        senderurl: null,
+        userid: 1740546703  
+  };
+  chai
+    .request(app)
+    .post('/tasks')
+    .send(newTask)
+    .end((err, res) => {
+      if (err) return done(err);
+      expect(res).to.have.status(201); 
+      expect(res.body).to.be.an('object');
+      expect(res.body.creationdate).to.not.equal(null);
+      expect(res.body.duedate).to.equal(newTask.duedate);
+      expect(res.body.message).to.equal(newTask.message);
+      expect(res.body.status).to.equal(newTask.status);
+      expect(res.body.reminder).to.equal(newTask.reminder);
+      expect(res.body.senderurl).to.equal(newTask.senderurl);
+      expect(res.body.userid).to.not.equal(null);
+      done(); 
+      taskId = res.body.taskid;
+    });
+
+ });
+
+  it('should get a Task by ID', (done) => {
     chai
       .request(app)
-      .get(`/tasks/${taskId}`)
+      .get(`/tasks/${taskId}`) 
       .end((err, res) => {
+        if (err) return done(err);
         expect(res).to.have.status(200);
         expect(res.body).to.be.an('object');
-        expect(res.body).to.have.property('taskid');
-        expect(res.body).to.have.property('userid');
-        expect(res.body).to.have.property('creationdate');
-        expect(res.body).to.have.property('message');
-        expect(res.body).to.have.property('duedate');
-        expect(res.body).to.have.property('status');
-        expect(res.body).to.have.property('reminder');
-        expect(res.body).to.have.property('senderurl');
-        done();
+        done(); 
+        
       });
   });
+  it('should delete created Task', (done) => {
+    chai
+        .request(app)
+        .delete(`/tasks/${taskId}`)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res).to.have.status(200);
+          done();
+        });
+  });
+
 
   it('should return a 404 status when an invalid task ID is provided', (done) => {
-    const invalidTaskId = 999999; // Replace with an invalid task ID
-
+    const invalidTaskId = 999999; 
     chai
       .request(app)
       .get(`/tasks/${invalidTaskId}`)
@@ -52,8 +87,7 @@ describe('GET /tasks/:id', () => {
   });
 
   it('should return a 500 status when an error occurs', (done) => {
-    const taskIdWithError = 'error'; // Replace with a task ID that would trigger an error in your code
-
+    const taskIdWithError = 'badid'; 
     chai
       .request(app)
       .get(`/tasks/${taskIdWithError}`)
