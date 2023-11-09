@@ -101,7 +101,7 @@ router.post('/', async (req, res) => {
     const actualid = rows[0].userid;
     console.log('actualid:', actualid);
 
-    const query = 'INSERT INTO task (creationdate,message, status, senderurl,userid) VALUES ($1, $2, $3, $4, $5) RETURNING id';
+    const query = 'INSERT INTO task (creationdate,message, status, senderurl,userid) VALUES ($1, $2, $3, $4, $5) RETURNING taskid';
     const { rows: insertedRows } = await pool.query(query, [ currentDate, message,status,senderurl, actualid]);
     res.status(201).json(insertedRows[0]);
   } catch (error) {
@@ -115,7 +115,7 @@ router.put('/:id', async (req, res) => {
   const taskId = req.params.id;
   const { message, status, reminder } = req.body;
   try {
-    const { rows } = await pool.query('UPDATE task SET message = $1, status = $2, reminder = $3 WHERE taskid = $4 RETURNING id', [message, status,reminder, taskId]);
+    const { rows } = await pool.query('UPDATE task SET message = $1, status = $2, reminder = $3 WHERE taskid = $4 RETURNING taskid', [message, status,reminder, taskId]);
     if (rows.length === 0) {
       res.status(404).json({ error: 'Task not found' });
     } else {
