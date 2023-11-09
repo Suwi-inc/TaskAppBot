@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
 });
 //attachment by id
 router.get('/:id', async (req, res) => {
-  const attachmentId = req.params.attachmentid;
+  const attachmentId = req.params.id;
   try {
     const { rows } = await pool.query('SELECT * FROM attachment WHERE attachmentid = $1', [attachmentId]);
     if (rows.length === 0) {
@@ -39,7 +39,7 @@ router.get('/:id', async (req, res) => {
 
 //get attachment by task id
 router.get('/taskid/:id', async (req, res) => {
-  const taskid = req.params.taskid; 
+  const taskid = req.params.id; 
   if (!taskid) {
     return res.status(400).json({ error: 'Task ID is required' });
   }
@@ -81,7 +81,7 @@ router.post('/', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
 
-  const taskId = req.params.taskid;
+  const taskId = req.params.id;
   try {
     const { rows } = await pool.query('DELETE FROM attachment WHERE taskid = $1 RETURNING *', [taskId]);
     if (rows.length === 0) {
