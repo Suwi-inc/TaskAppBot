@@ -11,7 +11,7 @@ const pool = new Pool({
     rejectUnauthorized: false, 
   },
 });
-//get json object of attachments
+//get all attachments
 router.get('/', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM attachment');
@@ -21,13 +21,13 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
+//attachment by id
 router.get('/:id', async (req, res) => {
-  const taskId = req.params.id;
+  const attachmentId = req.params.attachmentid;
   try {
-    const { rows } = await pool.query('SELECT * FROM attachment WHERE attachmentid = $1', [taskId]);
+    const { rows } = await pool.query('SELECT * FROM attachment WHERE attachmentid = $1', [attachmentId]);
     if (rows.length === 0) {
-      res.status(404).json({ error: 'Task not found' });
+      res.status(404).json({ error: 'attachement not found' });
     } else {
       res.json(rows[0]);
     }
@@ -37,16 +37,14 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-//get attachment by task id, task id is passed in params req, recieve a json of all attachements  givem task id
-//need to add router that gets the task id before calling this router
-router.get('/telegram/:telegramid', async (req, res) => {
-  const taskid = req.params.taskId; 
+//get attachment by task id
+router.get('/taskid/:id', async (req, res) => {
+  const taskid = req.params.taskid; 
   if (!taskid) {
-   
     return res.status(400).json({ error: 'Task ID is required' });
   }
   try {
-    const { rows } = await pool.query('SELECT file from attachment a JOIN task t ON a.taskid = t.taskid where a.taskid = $1',[taskid]);
+    const { rows } = await pool.query('SELECT file from attachment where taskid = $1',[taskid]);
     res.json(rows);
   } catch (error) {
     console.error(error);
@@ -61,8 +59,6 @@ router.post('/', async (req, res) => {
     
     if(taskid)
     {
-        console.log('task with id $1 exists :',[taskid])
-        
     const query = 'INSERT INTO attachment (file, taskid) VALUES ($1, $2) RETURNING *';
     const { rows: insertedRows } = await pool.query(query, [file, taskid]);
 
@@ -70,7 +66,7 @@ router.post('/', async (req, res) => {
 
     } else{
 
-        res.status(404).json({ error: 'User not found' });
+        res.status(404).json({ error: 'Task not found' });
         return;
     }
 
@@ -81,12 +77,13 @@ router.post('/', async (req, res) => {
   }
 });
 
-//no put route for attachments
+//delete attachments by task id
 
 router.delete('/:id', async (req, res) => {
-  const attachmentid = req.params.id;
+
+  const taskId = req.params.taskid;
   try {
-    const { rows } = await pool.query('DELETE FROM attachment WHERE attachmentid = $1 RETURNING *', [attachmentid]);
+    const { rows } = await pool.query('DELETE FROM attachment WHERE taskid = $1 RETURNING *', [taskId]);
     if (rows.length === 0) {
       res.status(404).json({ error: 'attachment not found' });
     } else {
