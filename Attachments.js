@@ -52,6 +52,22 @@ router.get('/taskid/:id', async (req, res) => {
   }
 });
 
+//get attachments by telegram id
+router.get('/telegramid/:id', async (req, res) => {
+  const telegramid = req.params.id; 
+  if (!telegramid) {
+    return res.status(400).json({ error: 'Telegram ID is required' });
+  }
+  try {
+    const { rows } = await pool.query('SELECT a.file, a.taskid FROM attachment a JOIN task t ON a.taskid = t.taskid JOIN botuser u ON t.userid = u.userid WHERE u.telegramid = $1',[telegramid]);
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 //post attachment data to db, recieve the file and taskid from the bot api
 router.post('/', async (req, res) => {
   const { file , taskid } = req.body;
