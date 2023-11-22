@@ -89,6 +89,7 @@ router.post('/', async (req, res) => {
   try {
     let currentDate = new Date();
     currentDate = currentDate.toISOString().replace('T', ' ').slice(0, -5);
+    console.log(currentDate);
     //user id in this case is the telegram user id
 
     const { rows } = await pool.query('SELECT userid FROM botuser WHERE telegramid = $1', [userid]);
