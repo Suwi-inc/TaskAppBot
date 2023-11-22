@@ -149,6 +149,7 @@ router.put('/status/:id', async (req, res) => {
 router.put('/reminder/:id', async (req, res) => {
   const taskId = req.params.id;
   const { reminder } = req.body;
+  console.log(reminder);
   try {
     const { rows } = await pool.query('UPDATE task SET reminder = $1 WHERE taskid = $4 RETURNING *', [reminder, taskId]);
     if (rows.length === 0) {
