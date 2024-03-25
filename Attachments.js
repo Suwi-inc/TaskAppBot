@@ -3,8 +3,8 @@ require("dotenv").config();
 const { Pool } = require('pg');
 const router = express.Router();
 
-const URL = "postgres://mqpnptxk:RmLLPKHco0tZNR3p7pr0lhCc2BnJzhwQ@ella.db.elephantsql.com/mqpnptxk";
-
+//const URL = "postgres://mqpnptxk:RmLLPKHco0tZNR3p7pr0lhCc2BnJzhwQ@ella.db.elephantsql.com/mqpnptxk";
+const URL = process.env.URL;
 const pool = new Pool({
   connectionString: URL,
   ssl: {
